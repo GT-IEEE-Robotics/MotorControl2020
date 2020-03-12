@@ -39,7 +39,7 @@ class JetsonCamera:
         self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=0), cv2.CAP_GSTREAMER)
 
     def read(self):
-        if self.cap.isOpened() and cv2.getWindowProperty("CSI Camera", 0):
-            ret_val, img = cap.read()
+        if self.cap.isOpened():
+            ret_val, img = self.cap.read()
             if ret_val:
                 return img

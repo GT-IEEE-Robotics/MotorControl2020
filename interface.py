@@ -5,7 +5,6 @@ Author:        Ammar Ratnani
 Last Modified: Binit on 3/11
 """
 
-import sim
 from time import time
 from interfaces.serial_communicator import SerialCommunicator
 from interfaces.jetson_camera import JetsonCamera
@@ -37,6 +36,7 @@ def set_system(stype, sim_config=None, motor_port='/dev/ttyACM0', stepper_port='
 
     system_type = stype
     if system_type == "sim":
+        import sim
         sim.start(sim_config)
     elif system_type == "raspi":
         comms = SerialCommunicator(motor_port=motor_port, stepper_port=stepper_port)
