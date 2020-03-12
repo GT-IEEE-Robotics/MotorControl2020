@@ -77,7 +77,7 @@ def read_image():
         raise ValueError('System type has not been set')
 
 
-def command_wheel_velocities(wheel_vels, is_conservative):
+def command_wheel_velocities(wheel_vels, is_conservative=False):
     """Commands the two motors to target angular velocities.
     wheel_vels[0] = left wheel target omega
     wheel_vels[1] = right wheel target omega
@@ -98,7 +98,7 @@ def command_wheel_velocities(wheel_vels, is_conservative):
     global system_type, comms
 
     if system_type == "sim":
-        return sim.command_robot_vels(*wheel_vels, is_conservative)
+        return sim.command_robot_vels(*wheel_vels)
     elif system_type == "raspi":
         pass
     elif system_type == "jetson":

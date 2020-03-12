@@ -15,25 +15,26 @@ class SerialCommunicator:
     def __init__(self, portA='/dev/ttyACM0', portB='/dev/ttyACM1', baud=115200, tout=.5):
         # Read from both of the ports
         sr1 = serial.Serial(portA, baud, timeout=tout)
-        sr2 = serial.Serial(portA, baud, timeout=tout)
-        # Wait for the arduinos to boot, then read the result
-        time.sleep(3)
-        sr1res = sr1.readline().decode("utf-8")[0:-2]
-        sr2res = sr2.readline().decode("utf-8")[0:-2]
+        self.sr_motor = sr1
+        # sr2 = serial.Serial(portA, baud, timeout=tout)
+        # # Wait for the arduinos to boot, then read the result
+        # time.sleep(3)
+        # sr1res = sr1.readline().decode("utf-8")[0:-2]
+        # sr2res = sr2.readline().decode("utf-8")[0:-2]
 
-        # Figure out which one is which
-        if sr1res not in ["stepper","motor"] \
-        or sr2res not in ["stepper","motor"] \
-        or sr1res != sr2res:
-            raise RuntimeError("Invalid arduinos")
-        elif sr1res == "stepper":
-            self.sr_stepper = sr1
-            self.sr_motor = sr2
-        elif sr2res == "stepper":
-            self.sr_stepper = sr2
-            self.sr_motor = sr1
-        else:
-            raise RuntimeError("Invalid arduinos")
+        # # Figure out which one is which
+        # if sr1res not in ["stepper","motor"] \
+        # or sr2res not in ["stepper","motor"] \
+        # or sr1res != sr2res:
+        #     raise RuntimeError("Invalid arduinos")
+        # elif sr1res == "stepper":
+        #     self.sr_stepper = sr1
+        #     self.sr_motor = sr2
+        # elif sr2res == "stepper":
+        #     self.sr_stepper = sr2
+        #     self.sr_motor = sr1
+        # else:
+        #     raise RuntimeError("Invalid arduinos")
 
     def close(self):
         if self.sr_motor.isOpen():
