@@ -14,17 +14,21 @@ system_type = None
 comms = None
 cam = None
 
-def set_system(stype, sim_config=None, portA='/dev/ttyACM0', portB='/dev/ttyACM1'):
+def set_system(stype, sim_config=None, motor_port='/dev/ttyACM0', stepper_port='/dev/ttyACM1'):
     """Configures system type on which software is running.
 
     Since the low level manipulation of GPIO, image capture,
     and system type depends on the hardware upon which the
     software is running, we set the system type here. 
 
-    :param stype:      options: ["sim", "raspi", "jetson"]
-    :type stype:       str
-    :param sim_config: configuration with which to start the simulator
-    :type sim_config:  sim.SimConfig
+    :param stype:        options: ["sim", "raspi", "jetson"]
+    :type stype:         str
+    :param sim_config:   configuration with which to start the simulator
+    :type sim_config:    sim.SimConfig
+    :param motor_port:   serial port of the motor controller
+    :type motor_port:    str
+    :param stepper_port: serial port of the stepper controller
+    :type stepper_port:  str
     """
     global system_type, comms, cam
 
@@ -35,10 +39,10 @@ def set_system(stype, sim_config=None, portA='/dev/ttyACM0', portB='/dev/ttyACM1
     if system_type == "sim":
         sim.start(sim_config)
     elif system_type == "raspi":
-        comms = SerialCommunicator(portA=portA, portB=portB)
+        comms = SerialCommunicator(motor_port=motor_port, stepper_port=stepper_port)
     elif system_type == "jetson":
         cam = JetsonCamera()
-        comms = SerialCommunicator(portA=portA, portB=portB)
+        comms = SerialCommunicator(motor_port=motor_port, stepper_port=stepper_port)
     else:
         raise ValueError(f'Invalid system type: {stype}')
 
@@ -100,9 +104,9 @@ def command_wheel_velocities(wheel_vels, is_conservative=False):
     if system_type == "sim":
         return sim.command_robot_vels(*wheel_vels)
     elif system_type == "raspi":
-        pass
+        return comms.set_target_vels(*wheel_vels, is_conservative)
     elif system_type == "jetson":
-        board.setTargetVels(*wheel_vels, is_conservative)
+        return comms.set_target_vels(*wheel_vels, is_conservative)
     else:
         raise ValueError('System type has not been set')
 

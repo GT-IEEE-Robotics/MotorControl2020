@@ -12,29 +12,14 @@ class SerialCommunicator:
     """Uses Serial to communicate with two teensies.
     """
 
-    def __init__(self, portA='/dev/ttyACM0', portB='/dev/ttyACM1', baud=115200, tout=.5):
+    def __init__(self, motor_port='/dev/ttyACM0', stepper_port='/dev/ttyACM1', baud=115200, tout=.5):
         # Read from both of the ports
-        sr1 = serial.Serial(portA, baud, timeout=tout)
-        self.sr_motor = sr1
-        # sr2 = serial.Serial(portA, baud, timeout=tout)
-        # # Wait for the arduinos to boot, then read the result
-        # time.sleep(3)
-        # sr1res = sr1.readline().decode("utf-8")[0:-2]
-        # sr2res = sr2.readline().decode("utf-8")[0:-2]
-
-        # # Figure out which one is which
-        # if sr1res not in ["stepper","motor"] \
-        # or sr2res not in ["stepper","motor"] \
-        # or sr1res != sr2res:
-        #     raise RuntimeError("Invalid arduinos")
-        # elif sr1res == "stepper":
-        #     self.sr_stepper = sr1
-        #     self.sr_motor = sr2
-        # elif sr2res == "stepper":
-        #     self.sr_stepper = sr2
-        #     self.sr_motor = sr1
-        # else:
-        #     raise RuntimeError("Invalid arduinos")
+        self.sr_motor = serial.Serial(motor_port, baud, parity=serial.PARITY_ODD,
+        stopbits=serial.STOPBITS_TWO,
+        bytesize=serial.SEVENBITS,
+        timeout=0.1)
+        time.sleep(1)
+        # self.sr_stepper = serial.Serial(stepper_port, baud, timeout=tout)
 
     def close(self):
         if self.sr_motor.isOpen():
@@ -48,12 +33,10 @@ class SerialCommunicator:
         # Can generate an exception
         # If we fail for any reason, return None
         try:
-            # Write to the Serial
-            self.sr_motor.write(str.encode(f"<{w_l},{w_r},{int(is_conservative)}>\n"))
+            self.sr_motor.write(str.encode(f"<{'{:.6f}'.format(w_l)},{'{:.6f}'.format(w_r)},{int(is_conservative)}>\n"))
             self.sr_motor.flush()
-            # Parse the result
-            return tuple(map(int,
-                self.sr_motor.readline().decode("utf-8")[1:-3].split(",")))
+            raw = self.sr_motor.readline().decode("utf-8")[1:-3].split(",")
+            return (float(raw[0]), float(raw[1]), float(raw[2]))
         except:
             return None
 

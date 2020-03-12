@@ -15,6 +15,8 @@ setup(
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     python_requires='>=3.5',
-    install_requires=['simulator2020']
+    install_requires=['pyserial',
+                      'opencv-python',
+                      'simulator2020']
 )
 
